@@ -1,3 +1,5 @@
+// Bryan Liu for CS2
+
 public class BestFriend extends Person
 {
     private String birthday;

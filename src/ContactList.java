@@ -1,3 +1,5 @@
+// Bryan Liu for CS2
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -136,14 +138,131 @@ public class ContactList
         Scanner input = new Scanner(System.in);
         switch(input.nextInt())
         {
+            // Exit
             case 0:
                 return;
 
-            // Add Contact
+            // Add contact
             case 1:
-                //
+                // Handles the entire process for adding a new contact (prompting user, extracting info, and creating person)
+                contactAdding();
+
+            // List all contacts by first name
+            case 2:
+                sort(0);
+                printContacts();
+
+            // List all contacts by last name
+            case 3:
+                sort(1);
+                printContacts();
+
+            // List all contacts by phone number
+            case 4:
+                sort(2);
+                printContacts();
+
+            // List all students
+            case 5:
+                listStudents();
+
+            // Search by first name
+            case 6:
+                Scanner newInput = new Scanner(System.in);
+                System.out.println("Which contact would you like to find?");
+                Person person = searchByFirstName(newInput.nextLine());
+
+                if (person != null)
+                {
+                    System.out.println(person);
+                }
+                else
+                {
+                    System.out.println("Contact not found");
+                }
+
+            // Search by last name
+            case 7:
+                Scanner newInput = new Scanner(System.in);
+                System.out.println("Which contact would you like to find?");
+                person = searchByFirstName(newInput.nextLine());
+
+                if (person != null)
+                {
+                    System.out.println(person);
+                }
+                else
+                {
+                    System.out.println("Contact not found");
+                }
         }
 
+    }
+
+    public void contactAdding()
+    {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter the following contact information, separated by commas: First Name, Last Name, Phone Number");
+        String personInfo = input.nextLine();
+
+        System.out.println("Enter the following contact information, separated by commas. If no info, write 'none': Grade, Birthday, Days Best Friend");
+        String subPersonInfo = input.nextLine();
+
+        // Extracts first name, last name, phone number, grade, birthday, and days best friend from input and makes person
+        addContact(makePerson(personInfo,subPersonInfo));
+    }
+
+    public Person makePerson(String personInfo, String subPersonInfo)
+    {
+        ArrayList<String> personInfoSeparated = new ArrayList<String>();
+
+        String totalInfo = personInfo + ", " + subPersonInfo;
+
+        extractInfo(totalInfo,personInfoSeparated,totalInfo,0);
+
+        if (personInfoSeparated.get(3).equals("none"))
+        {
+            if (personInfoSeparated.get(4).equals("none"))
+            {
+                Person person = new Person(personInfoSeparated.get(0), personInfoSeparated.get(1), personInfoSeparated.get(2));
+                return person;
+            }
+            else
+            {
+                BestFriend person = new BestFriend(personInfoSeparated.get(0), personInfoSeparated.get(1), personInfoSeparated.get(2), personInfoSeparated.get(4), Integer.parseInt(personInfoSeparated.get(5)));
+                return person;
+            }
+        }
+        else
+        {
+            Student person = new Student(personInfoSeparated.get(0), personInfoSeparated.get(1), personInfoSeparated.get(2), Integer.parseInt(personInfoSeparated.get(3)));
+            return person;
+        }
+    }
+
+    public void extractInfo(String rawInfo, ArrayList<String> separatedInfo, String ogInfo, int index)
+    {
+        // Base case: if the rawInfo has been completely parsed, return
+        if (rawInfo.length() == 0)
+        {
+            return;
+        }
+
+        if (rawInfo.charAt(0) != ',')
+        {
+            if (rawInfo.length()-1 == 0)
+            {
+                separatedInfo.add(ogInfo);
+                return;
+            }
+            extractInfo(rawInfo.substring(1),separatedInfo,ogInfo,index+1);
+        }
+
+        else if (rawInfo.charAt(0) == ',')
+        {
+            separatedInfo.add(ogInfo.substring(0,index));
+            extractInfo(rawInfo.substring(1),separatedInfo,ogInfo.substring(index+1),0);
+        }
     }
 
     public static void printStartScreen()
