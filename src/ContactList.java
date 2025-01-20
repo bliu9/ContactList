@@ -17,11 +17,6 @@ public class ContactList
         return contacts;
     }
 
-    public void addContact(Person person)
-    {
-        contacts.add(person);
-    }
-
     public void printContacts()
     {
         for (Person person : contacts)
@@ -73,7 +68,7 @@ public class ContactList
             {
                 for (int j = 0; j < contacts.size()-i-1; j++)
                 {
-                    if (j+1 < contacts.size() && contacts.get(j).getPhoneNumber().compareTo(contacts.get(j+1).getPhoneNumber()) > 0)
+                    if (j+1 < contacts.size() && Integer.valueOf(contacts.get(j).getPhoneNumber()) > Integer.valueOf(contacts.get(j+1).getPhoneNumber()))
                     {
                         Person toSwap = contacts.get(j);
                         contacts.set(j,contacts.get(j+1));
@@ -133,142 +128,140 @@ public class ContactList
 
     public void run()
     {
-        printStartScreen();
-
         Scanner input = new Scanner(System.in);
-        switch(input.nextInt())
+        while (true)
         {
-            // Exit
-            case 0:
-                return;
+            printMenuScreen();
+            switch (input.nextInt())
+            {
+                // Exit
+                case 0:
+                    return;
 
-            // Add contact
-            case 1:
-                // Handles the entire process for adding a new contact (prompting user, extracting info, and creating person)
-                contactAdding();
+                // Add contact
+                case 1:
+                    // Handles the entire process for adding a new contact (prompting user, extracting info, and creating person)
+                    addContact();
+                    break;
 
-            // List all contacts by first name
-            case 2:
-                sort(0);
-                printContacts();
+                    // List all contacts by first name
+                case 2:
+                    sort(0);
+                    printContacts();
+                    break;
 
-            // List all contacts by last name
-            case 3:
-                sort(1);
-                printContacts();
+                    // List all contacts by last name
+                case 3:
+                    sort(1);
+                    printContacts();
+                    break;
 
-            // List all contacts by phone number
-            case 4:
-                sort(2);
-                printContacts();
+                    // List all contacts by phone number
+                case 4:
+                    sort(2);
+                    printContacts();
+                    break;
 
-            // List all students
-            case 5:
-                listStudents();
+                    // List all students
+                case 5:
+                    listStudents();
+                    break;
 
-            // Search by first name
-            case 6:
-                Scanner newInput = new Scanner(System.in);
-                System.out.println("Which contact would you like to find?");
-                Person person = searchByFirstName(newInput.nextLine());
+                    // Search by first name
+                case 6:
+                    Scanner newInput = new Scanner(System.in);
+                    System.out.println("Enter a name:");
+                    String name = newInput.nextLine();
+                    Person person = searchByFirstName(name);
 
-                if (person != null)
-                {
-                    System.out.println(person);
-                }
-                else
-                {
-                    System.out.println("Contact not found");
-                }
+                    if (person != null) {
+                        System.out.println(person);
+                    } else {
+                        System.out.println(name + " is not on the list");
+                    }
+                    break;
 
-            // Search by last name
-            case 7:
-                Scanner newInput = new Scanner(System.in);
-                System.out.println("Which contact would you like to find?");
-                person = searchByFirstName(newInput.nextLine());
+                    // Search by last name
+                case 7:
+                    newInput = new Scanner(System.in);
+                    System.out.println("Enter a name:");
+                    name = newInput.nextLine();
+                    person = searchByLastName(name);
 
-                if (person != null)
-                {
-                    System.out.println(person);
-                }
-                else
-                {
-                    System.out.println("Contact not found");
-                }
+                    if (person != null) {
+                        System.out.println(person);
+                    } else {
+                        System.out.println(name + " is not on the list");
+                    }
+                    break;
+
+                    // Search by phone number
+                case 8:
+                    newInput = new Scanner(System.in);
+                    System.out.println("Enter a phone number:");
+                    name = newInput.nextLine();
+                    person = searchByPhoneNumber(name);
+
+                    if (person != null) {
+                        System.out.println(person);
+                    } else {
+                        System.out.println(name + " is not on the list");
+                    }
+                    break;
+            }
         }
-
     }
 
-    public void contactAdding()
+    public void addContact()
     {
         Scanner input = new Scanner(System.in);
-        System.out.println("Enter the following contact information, separated by commas: First Name, Last Name, Phone Number");
-        String personInfo = input.nextLine();
-
-        System.out.println("Enter the following contact information, separated by commas. If no info, write 'none': Grade, Birthday, Days Best Friend");
-        String subPersonInfo = input.nextLine();
-
-        // Extracts first name, last name, phone number, grade, birthday, and days best friend from input and makes person
-        addContact(makePerson(personInfo,subPersonInfo));
+        System.out.println("Select a type of contact add:\n1. Person\n2. Student\n3. Best Friend");
+        int selection = input.nextInt();
+        contacts.add(makeContact(selection));
     }
 
-    public Person makePerson(String personInfo, String subPersonInfo)
+    public Person makeContact(int contactType)
     {
-        ArrayList<String> personInfoSeparated = new ArrayList<String>();
+        Scanner input = new Scanner(System.in);
+        System.out.println("Please fill in the following information.\nFirst Name:");
+        String firstName = input.nextLine();
+        System.out.println("Last Name:");
+        String lastName = input.nextLine();
+        System.out.println("Phone Number:");
+        String phoneNumber = input.nextLine();
 
-        String totalInfo = personInfo + ", " + subPersonInfo;
+        int grade;
+        String birthday;
+        int daysBestFriend;
 
-        extractInfo(totalInfo,personInfoSeparated,totalInfo,0);
-
-        if (personInfoSeparated.get(3).equals("none"))
+        if (contactType == 2)
         {
-            if (personInfoSeparated.get(4).equals("none"))
-            {
-                Person person = new Person(personInfoSeparated.get(0), personInfoSeparated.get(1), personInfoSeparated.get(2));
-                return person;
-            }
-            else
-            {
-                BestFriend person = new BestFriend(personInfoSeparated.get(0), personInfoSeparated.get(1), personInfoSeparated.get(2), personInfoSeparated.get(4), Integer.parseInt(personInfoSeparated.get(5)));
-                return person;
-            }
+            System.out.println("Grade:");
+            grade = input.nextInt();
+            return new Student(firstName,lastName,phoneNumber,grade);
         }
-        else
+        else if (contactType == 3)
         {
-            Student person = new Student(personInfoSeparated.get(0), personInfoSeparated.get(1), personInfoSeparated.get(2), Integer.parseInt(personInfoSeparated.get(3)));
-            return person;
+            System.out.println("Birthday: ");
+            birthday = input.nextLine();
+            System.out.println("Days Best Friend");
+            daysBestFriend = input.nextInt();
+            return new BestFriend(firstName,lastName,phoneNumber,birthday,daysBestFriend);
         }
+
+        return new Person(firstName,lastName,phoneNumber);
     }
 
-    public void extractInfo(String rawInfo, ArrayList<String> separatedInfo, String ogInfo, int index)
-    {
-        // Base case: if the rawInfo has been completely parsed, return
-        if (rawInfo.length() == 0)
-        {
-            return;
-        }
-
-        if (rawInfo.charAt(0) != ',')
-        {
-            if (rawInfo.length()-1 == 0)
-            {
-                separatedInfo.add(ogInfo);
-                return;
-            }
-            extractInfo(rawInfo.substring(1),separatedInfo,ogInfo,index+1);
-        }
-
-        else if (rawInfo.charAt(0) == ',')
-        {
-            separatedInfo.add(ogInfo.substring(0,index));
-            extractInfo(rawInfo.substring(1),separatedInfo,ogInfo.substring(index+1),0);
-        }
-    }
-
-    public static void printStartScreen()
+    public static void printMenuScreen()
     {
         System.out.println("Menu:\n1. Add Contact\n2. List All Contacts By First Name\n3. List All Contacts By Last Name" +
                 "\n4. List All Contacts By Phone Number\n5. List All Students\n6. Search By First Name\n7. Search By Last Name" +
                 "\n8. Search By Phone Number\n0. Exit");
+    }
+
+    public static void main(String[] args)
+    {
+        ContactList contactList = new ContactList();
+        contactList.run();
     }
 }
